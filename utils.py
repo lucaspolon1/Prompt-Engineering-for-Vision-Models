@@ -1,15 +1,15 @@
 import os
 import json
 import random
+import shutil
 
+from matplotlib.pylab import f
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
-from huggingface_hub import hf_hub_download
 
 import numpy as np
 from PIL import Image
 import torch
-from skimage import measure
 
 
 def preprocess_outputs(output):
@@ -437,49 +437,25 @@ def make_mask_annots(input_masks,
     return annotations
 
 
-def get_model_path(model_key):
+def get_model(model_name):
     """ Get the local path of the model or download it if not available.
 
     Args:
-        name (_type_): options: fastsam, mobilesam, sam-vit-h
+        name (_type_): options:
+        'mobile_sam', 'FastSAM-s', 'sam_b', 'sam_l', 'sam2.1_b', 'sam2_b', 'sam2.1_s', 'sam2_s', 'sam2.1_l', 'sam2_l', 'sam2.1_t', 'sam2_t'
 
     Returns:
         _type_: _description_
     """
-    MODEL_PATHS = {
-        "fastsam": {
-            "repo_id": "Uminosachi/FastSAM",
-            "filename": "FastSAM-s.pt",
-            "local_filename": "fastsam-s.pt",
-            "local_dir": "models/"
-        },
-        "mobilesam": {
-            "repo_id": "Uminosachi/MobileSAM",
-            "filename": "mobile_sam.pt",
-            "local_filename": "mobile_sam.pt",
-            "local_dir": "models/"
-        }
-    }
-
-    if model_key not in MODEL_PATHS:
-        raise ValueError(f"Model '{model_key}' not found in MODEL_PATHS.")
-
-    model_info = MODEL_PATHS[model_key]
-    local_dir = model_info["local_dir"]
-    local_path = os.path.join(local_dir, model_info["local_filename"])
-
+    full_name = model_name + ".pt"
+    local_dir = 'models/'
     os.makedirs(local_dir, exist_ok=True)
 
-    # Download if not already present
-    if not os.path.exists(local_path):
-        print(f"Downloading '{model_key}' to '{local_path}'...")
-        downloaded_path = hf_hub_download(
-            repo_id=model_info["repo_id"],
-            filename=model_info["filename"],
-            cache_dir=local_dir,
-            local_dir=local_dir,
-            local_dir_use_symlinks=False
-        )
-        os.rename(downloaded_path, local_path)
+    local_path = os.path.join(local_dir, full_name)
 
-    return local_path
+    if os.path.exists(local_path):
+        return local_path
+    if os.path.exists(full_name):
+        shutil.move(full_name, local_path)
+        return local_path
+    return full_name
