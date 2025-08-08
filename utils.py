@@ -459,3 +459,41 @@ def get_model(model_name):
         shutil.move(full_name, local_path)
         return local_path
     return full_name
+
+
+def plot_multy(
+    imgs: list,
+    output_dir: str,
+    cols: int,
+    rows: int = 1,
+    titles: list = None
+) -> None:
+    output_dir = str(output_dir)
+    _, ax = plt.subplots(
+        nrows=rows, ncols=cols,
+        figsize=(cols * 4, rows * 4),
+        subplot_kw=dict(xticks=[], yticks=[])
+    )
+
+    plt.subplots_adjust(left=0.2)
+
+    if rows == 1:
+        ax = np.expand_dims(ax, 0)
+
+    cmap = 'gray' if len(np.shape(imgs[0])) == 2 else None
+    i = 0
+    for row in range(rows):
+        for col in range(cols):
+            ax[row, col].imshow(imgs[i], cmap=cmap)
+            if titles is None:
+                ax[row, col].set_title(f"{row}-{col}", fontsize=14)
+            else:
+                ax[row, col].set_title(titles[i], fontsize=14)
+            i += 1
+
+    plt.figtext(0.1, 0.5, output_dir.split('/')[-1],
+                va='center', ha='center', rotation=90, fontsize=16)
+
+    plt.savefig(output_dir)
+    plt.show()
+    plt.close("all")
