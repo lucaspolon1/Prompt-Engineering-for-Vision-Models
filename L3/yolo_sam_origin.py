@@ -1,20 +1,25 @@
 import ultralytics
 
-
 import time
 import torch
-from ultralytics import SAM
+from ultralytics import SAM, FastSAM
 
-
+print("Starting script...")
 print(ultralytics.checks())
 
 
 # Load model
 model_path = "sam2.1_b.pt"
+#model_path = "mobile_sam.pt"
+#model_path = "FastSAM-s.pt"
+
 
 # Run inference function
+print("Running warmup...")
 def run_inference(device, img_url):
-    model = SAM(model_path)
+    model = SAM(model_path) # default
+    #model = FastSAM(model_path)  # only activate for FastSAM-s
+
     model.to(device)
     start = time.time()
     results = model(img_url)
