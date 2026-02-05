@@ -1,3 +1,4 @@
+
 import time
 import torch
 from ultralytics import YOLO
@@ -7,21 +8,28 @@ from benchmark_helpers import run_yolo, run_yolo_cpu
 # something about running 5 warmups and averaging 100 trials to get steady state benchmarks.
 # personal bash: salloc --gres=gpu:1 --mem=16G --time=00:10:00, nvidia-smi
 
-
+# CONSTRAINTS
+NUM_WARMUPS = 5
+NUM_RUNS = 99
+OUTPUT_ROOT = "outputs/yolo_test6" # single folder for each run
 YOLO_MODELS = [
     "yolov8n.pt",
     "yolov8s.pt",
     "yolov8m.pt",
+    "yolov8l.pt",
+    "yolov8x.pt",
 ]
 
-# then I want to have it run "n" times (variable you can change at the top of the script) for each model
-# where there are "m" models
+# TODO
+
 # one run should output m folders each having n pictures
-# currently the helper recreates the model every call.
+# right now each picture goes into a different folder. I'd like them to all go in the same folder
+# labeling system for photos
 
 
 def main(device):
     for model_name in YOLO_MODELS:
+        print(f"\nLoading {model_name}...")
         model = YOLO(model_name)
 
         if device == "gpu":
@@ -34,16 +42,26 @@ def main(device):
             run_yolo(model, device, save_outputs=False)
 
         # --- RECORDED RUN
-        print(f"Benchmarking {model_name}...")
-        _, runtime = run_yolo(
-            model,
-            device,
-            output_dir="outputs/yolo_test2",
-            save_outputs=True
-        )
-        
-        print(f"{model_name} ({device.upper()}): {runtime:.4f} sec")
+        runtimes = []
 
+        for i in range(NUM_RUNS):
+            run_id = f"{i+1:02d}"
+            out_name = f"bus_{model_name.replace('.pt','')}{run_id}"
+
+            _, runtime = run_yolo(
+                model,
+                device,
+                output_dir="outputs/yolo_test5",
+                save_outputs=True,
+                out_name=out_name
+            )
+            runtimes.append(runtime)
+
+        avg_time = sum(runtimes) / len(runtimes) #calculate avg time of each model.
+        print(
+            f"{model_name} ({device.upper()}): "
+            f"avg = {avg_time:.4f} sec over {NUM_RUNS} runs"
+        )
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(

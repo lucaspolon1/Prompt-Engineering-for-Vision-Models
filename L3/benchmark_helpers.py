@@ -7,16 +7,21 @@ from ultralytics import YOLO
 img = "bus.jpg"
 
 
-def run_yolo(model, device, output_dir=None, save_outputs=True):
-    # assume model already on correct device
+import os
+import cv2
+
+def run_yolo(model, device, output_dir=None, save_outputs=True, out_name=None):
     start = time.time()
 
-    results = model(
-        source=img,
-        save=save_outputs,
-        project=output_dir if save_outputs else None,
-        verbose=False
-    )
+    results = model(img, save=False, verbose=False)
+
+    if save_outputs and output_dir and out_name:
+        os.makedirs(output_dir, exist_ok=True)
+        img_out = results[0].plot()
+        cv2.imwrite(
+            os.path.join(output_dir, f"{out_name}.jpg"),
+            img_out
+        )
 
     return results, time.time() - start
 
