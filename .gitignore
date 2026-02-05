@@ -4,6 +4,7 @@ models/
 *run.sh
 output_*.txt
 error_*.txt
+outputs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
