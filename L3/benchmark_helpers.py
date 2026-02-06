@@ -1,18 +1,16 @@
 import time
 import torch
 from ultralytics import YOLO
+import os
+import cv2
 
 #img = "https://ultralytics.com/images/bus.jpg" # Changed to clean up output
 # bash: wget https://ultralytics.com/images/bus.jpg
 img = "bus.jpg"
 
 
-import os
-import cv2
-
 def run_yolo(model, device, output_dir=None, save_outputs=True, out_name=None):
     start = time.time()
-
     results = model(img, save=False, verbose=False)
 
     if save_outputs and output_dir and out_name:
@@ -24,6 +22,31 @@ def run_yolo(model, device, output_dir=None, save_outputs=True, out_name=None):
         )
 
     return results, time.time() - start
+
+def get_model_accuracy(model, model_name):
+    """Run validation to get mAP metrics.
+    Returns dict with mAP scores.
+
+    Args:
+        model (_type_): the model
+        model_name (_type_): the name of the model
+    """
+    print(f"Running validation for {model_name}...")
+
+    # Run validation on COCO dataset (YOLO will download if needed)
+    metrics = model.val(data='coco.yaml', verbose=False)
+    
+    # Extract mAP metrics
+    accuracy_results = {
+        'model': model_name,
+        'mAP50-95': float(metrics.box.map),    # mAP at IoU 0.5:0.95
+        'mAP50': float(metrics.box.map50),      # mAP at IoU 0.5
+        'mAP75': float(metrics.box.map75),      # mAP at IoU 0.75
+    }
+    
+    print(f"  ✓ {model_name}: mAP50-95={accuracy_results['mAP50-95']:.3f}, mAP50={accuracy_results['mAP50']:.3f}")
+    
+    return accuracy_results
 
 def run_yolo_cpu(model_name, output_dir=None, warmup=False):
     """

@@ -5,6 +5,10 @@ models/
 output_*.txt
 error_*.txt
 outputs/
+*.jpg
+runs/
+datasets/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
