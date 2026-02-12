@@ -10,18 +10,40 @@ from benchmark_helpers import run_yolo, get_model_accuracy
 # CONSTRAINTS
 NUM_WARMUPS = 5
 NUM_RUNS = 20
-OUTPUT_ROOT = "outputs/yolo_test6" # single folder for each run
+OUTPUT_ROOT = "outputs/yolo_test7" # single folder for each run
 YOLO_MODELS = [
     "yolov8n.pt",
     "yolov8s.pt",
     "yolov8m.pt",
-    #"yolov8l.pt",
-    #"yolov8x.pt",
+    "yolov8l.pt",
+    "yolov8x.pt",
+
+    "yolo11n.pt",  # YOLOv11 nano
+    "yolo11s.pt",  # YOLOv11 small
+    "yolo11m.pt",  # YOLOv11 medium
+    "yolo11l.pt",  # YOLOv11 large
+    "yolo11x.pt",  # YOLOv11 xlarge
+
+    "yolov10n.pt",
+    "yolov10s.pt",
+    "yolov10m.pt",
+    "yolov10l.pt",
+    "yolov10x.pt",
+
+    "yolov9t.pt",  # tiny
+    "yolov9s.pt",
+    "yolov9m.pt",
+    "yolov9c.pt",  # compact
+    "yolov9e.pt",  # extended
+
+
 ]
+MAP_METRIC = "mAP50" # "mAP50-95", "mAP50", "mAP75"
 
 # TODO
-# implement model validation (model.val()) 
-    # model val should be once per model for mAP
+# test all five models done 
+# test nano in CPU
+# try other image detection model
 
 
 
@@ -67,7 +89,7 @@ def main(device):
             )
             runtimes.append(runtime)
 
-        avg_time = sum(runtimes) / len(runtimes) #calculate avg time of each model.
+        avg_time = sum(runtimes) / len(runtimes)
 
         # Combine results
         result = {
@@ -85,12 +107,19 @@ def main(device):
 
     # --- SUMMARY TABLE ---
     print(f"\n{'='*60}")
-    print("SUMMARY")
+    print(f"SUMMARY (using {MAP_METRIC} for optimization)")
     print(f"{'='*60}")
-    print(f"{'Model':<12} {'mAP50-95':<10} {'mAP50':<10} {'Avg Time (s)':<15}")
+    print(f"{'Model':<12} {MAP_METRIC:<10} {'Avg Time (s)':<15}")
     print("-" * 60)
-    for r in all_results:
-        print(f"{r['model']:<12} {r['mAP50-95']:<10.3f} {r['mAP50']:<10.3f} {r['avg_runtime_sec']:<15.4f}")
+    for r in all_results: 
+        print(f"{r['model']:<12} {r[MAP_METRIC]:<10.3f} {r['avg_runtime_sec']:<15.4f}")
+
+    # Save results to CSV
+    from benchmark_helpers import save_results_to_csv, plot_speed_accuracy_tradeoff
+    save_results_to_csv(all_results, f"yolo_benchmark_{device}.csv")
+    
+    # Tradeoff plot (pass which metric to use)
+    plot_speed_accuracy_tradeoff(all_results, f"yolo_tradeoff_{device}.png", map_metric=MAP_METRIC)
     
     return all_results
 
