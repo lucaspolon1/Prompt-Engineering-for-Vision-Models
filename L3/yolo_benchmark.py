@@ -12,39 +12,48 @@ NUM_WARMUPS = 5
 NUM_RUNS = 20
 OUTPUT_ROOT = "outputs/yolo_test7" # single folder for each run
 YOLO_MODELS = [
-    "yolov8n.pt",
-    "yolov8s.pt",
-    "yolov8m.pt",
-    "yolov8l.pt",
-    "yolov8x.pt",
+    # "yolov8n.pt",
+    # "yolov8s.pt",
+    # "yolov8m.pt",
+    # "yolov8l.pt",
+    # "yolov8x.pt",
 
-    "yolo11n.pt",  # YOLOv11 nano
-    "yolo11s.pt",  # YOLOv11 small
-    "yolo11m.pt",  # YOLOv11 medium
-    "yolo11l.pt",  # YOLOv11 large
-    "yolo11x.pt",  # YOLOv11 xlarge
+    # "yolo11n.pt",  # YOLOv11 nano
+    # "yolo11s.pt",  # YOLOv11 small
+    # "yolo11m.pt",  # YOLOv11 medium
+    # "yolo11l.pt",  # YOLOv11 large
+    # "yolo11x.pt",  # YOLOv11 xlarge
 
-    "yolov10n.pt",
-    "yolov10s.pt",
-    "yolov10m.pt",
-    "yolov10l.pt",
-    "yolov10x.pt",
+    # "yolov10n.pt", # speed optimized models
+    # "yolov10s.pt",
+    # "yolov10m.pt",
+    # "yolov10l.pt",
+    # "yolov10x.pt",
 
-    "yolov9t.pt",  # tiny
-    "yolov9s.pt",
-    "yolov9m.pt",
-    "yolov9c.pt",  # compact
-    "yolov9e.pt",  # extended
-
+    # "yolov9t.pt",  # tiny
+    # "yolov9s.pt",
+    # "yolov9m.pt",
+    # "yolov9c.pt",  # compact
+    # "yolov9e.pt",  # extended
+    "yolo26n.pt",
+    "yolo26s.pt",
+    "yolo26m.pt",
+    "yolo26l.pt",
+    "yolo26x.pt",
 
 ]
 MAP_METRIC = "mAP50" # "mAP50-95", "mAP50", "mAP75"
 
 # TODO
-# test all five models done 
-# test nano in CPU
-# try other image detection model
+# document everything
+# gpu data (helpful to save data locally between every model
+# maybe put graphing functionality on a different code)
 
+# adjust data set (too big and not targeted for detection trash in nature)
+
+# watch L4
+# think about combining SAM with LLM (maybe custom ChatGPT) 
+        # -- probably more interested in SLM
 
 
 def main(device):
