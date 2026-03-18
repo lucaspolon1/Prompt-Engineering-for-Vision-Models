@@ -1,40 +1,65 @@
-import time
-import torch
+"""
+Simple YOLO object detection on a single image.
+Usage: python yolo_detect.py <image_path> [model_name]
+
+Usage:
+    python detect.py dogs.jpg
+    python detect.py dogs.jpg yolo11m.pt
+"""
+
+import sys
+import os
 from ultralytics import YOLO
-import argparse
-from benchmark_helpers import run_yolo, get_model_accuracy
+import cv2
 
-# personal bash: salloc --gres=gpu:1 --mem=16G --time=00:10:00, nvidia-smi
+def detect_objects(image_path, model_name="yolo26m.pt", output_dir="outputs"):
+    """
+    Run YOLO object detection on a single image.
+    
+    Args:
+        image_path: Path to input image
+        model_name: YOLO model to use
+        output_dir: Where to save output
+    """
+    # Check if image exists
+    if not os.path.exists(image_path):
+        print(f"Error: Image not found at {image_path}")
+        return
+    
+    # Load model
+    print(f"Loading {model_name}...")
+    model = YOLO(model_name)
+    
+    # Run detection
+    print(f"Running detection on {image_path}...")
+    results = model(image_path, verbose=True)
+    
+    # Save output
+    os.makedirs(output_dir, exist_ok=True)
+    base_name = os.path.splitext(os.path.basename(image_path))[0]
+    output_path = os.path.join(output_dir, f"{base_name}_detected.jpg")
+    
+    # Plot results and save
+    img_out = results[0].plot()
+    cv2.imwrite(output_path, img_out)
+    
+    print(f"\n✓ Detection complete!")
+    print(f"✓ Output saved to: {output_path}")
+    print(f"\nDetected objects:")
+    for r in results:
+        for box in r.boxes:
+            cls = int(box.cls[0])
+            conf = float(box.conf[0])
+            name = r.names[cls]
+            print(f"  - {name}: {conf:.2f}")
 
-OUTPUT_ROOT = "outputs/yolo_test7" # single folder for each run
-YOLO_MODELS = [
-    # "yolov8n.pt",
-    # "yolov8s.pt",
-    # "yolov8m.pt",
-    # "yolov8l.pt",
-    # "yolov8x.pt",
-
-    # "yolo11n.pt",  # YOLOv11 nano
-    # "yolo11s.pt",  # YOLOv11 small
-    # "yolo11m.pt",  # YOLOv11 medium
-    # "yolo11l.pt",  # YOLOv11 large
-    # "yolo11x.pt",  # YOLOv11 xlarge
-
-    # "yolov10n.pt", # speed optimized models
-    # "yolov10s.pt",
-    # "yolov10m.pt",
-    # "yolov10l.pt",
-    # "yolov10x.pt",
-
-    # "yolov9t.pt",  # tiny
-    # "yolov9s.pt",
-    # "yolov9m.pt",
-    # "yolov9c.pt",  # compact
-    # "yolov9e.pt",  # extended
-    "yolo26n.pt",
-    "yolo26s.pt",
-    "yolo26m.pt",
-    "yolo26l.pt",
-    "yolo26x.pt",
-]
-
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python yolo_detect.py <image_path> [model_name]")
+        print("Example: python yolo_detect.py dog.jpg yolo11m.pt")
+        sys.exit(1)
+    
+    image_path = sys.argv[1]
+    model_name = sys.argv[2] if len(sys.argv) > 2 else "yolo11m.pt"
+    
+    detect_objects(image_path, model_name)

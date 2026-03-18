@@ -24,7 +24,7 @@ pip install -r requirements.txt
 ## HPC Usage
 ```bash
 # Request GPU allocation
-salloc --gres=gpu:4 --mem=16G --time=00:30:00
+salloc --gres=gpu:1 --mem=16G --time=00:30:00
 
 # Check GPU
 nvidia-smi
@@ -80,13 +80,6 @@ MAP_METRIC = "mAP50"     # Which mAP to optimize for
 - What accuracy threshold is acceptable for real-time stream monitoring?
 - How to handle varying lighting conditions in stream footage?
 - Best way to track detected objects across frames?
-
-## Install Dependencies
-```bash
-conda create -n yolo python=3.10.19 pip
-conda activate yolo
-pip install -r requirements.txt
-```
 
 ## Notes
 - COCO validation dataset (~1GB) downloads on first mAP calculation
